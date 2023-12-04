@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bem-vindo</h1>
+
+    <ul id="listaObjetos">
+        @foreach (var obj in ViewData["ListaDeObjetos"] as List<ClasseAbstrata>)
+        {
+            <li>
+                ID: @obj.Id, Nome: @obj.Nome, Método: @obj.MetodoAbstrato()
+                <button type="button" class="btn btn-primary btn-sm" onclick="editarObjeto(@obj.Id)">Editar</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="excluirObjeto(@obj.Id)">Excluir</button>
+            </li>
+        }
+    </ul>
+
+    <form id="formularioObjeto">
+        <label for="nomeObjeto">Nome do Objeto:</label>
+        <input type="text" id="nomeObjeto" name="nomeObjeto" required>
+        <button type="button" class="btn btn-success" onclick="adicionarObjeto()">Adicionar Objeto</button>
+    </form>
+
+   
+    <div class="modal fade" id="editarModal" tabindex="-1" role="dialog" aria-labelledby="editarModalLabel" aria-hidden="true">
+        
+    </div>
+
+    
+    <div class="modal fade" id="excluirModal" tabindex="-1" role="dialog" aria-labelledby="excluirModalLabel" aria-hidden="true">
+        
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#listaObjetos button').hide();
+    });
+
+   function adicionarObjeto() 
+   {
+        var nomeObjeto = document.getElementById("nomeObjeto").value;
+        $.ajax({
+            type: "POST",
+            url: "/Home/AdicionarObjeto",
+            data: { nome: nomeObjeto },
+            success: function (objeto) {
+                var lista = document.getElementById("listaObjetos");
+                var novoItem = document.createElement("li");
+                novoItem.innerHTML = "ID: " + objeto.id + ", Nome: " + objeto.nome + ", Método: " + objeto.metodoAbstrato +
+                    ' <button type="button" class="btn btn-primary btn-sm" onclick="editarObjeto(' + objeto.id + ')">Editar</button>' +
+                    ' <button type="button" class="btn btn-danger btn-sm" onclick="excluirObjeto(' + objeto.id + ')">Excluir</button>';
+                lista.appendChild(novoItem);
+            }
+        });
+    }
+
+    function editarObjeto(id) 
+    {
+        var nomeAtual = $('#listaObjetos li:contains("ID: ' + id + '")').text().split(',')[1].split(':')[1].trim();
+        $('#nomeObjetoEdit').val(nomeAtual)
+        $('#editarModal').modal('show');
+    }
+
+    function salvarEdicao() 
+    {
+        $('#editarModal').modal('hide');
+    }
+
+    function excluirObjeto(id) 
+    {
+        $('#excluirModal').modal('show');
+    }
+
+    function confirmarExclusao() 
+    {
+        $('#excluirModal').modal('hide');
+    }
+</script>
+
